@@ -1,2 +1,3 @@
-# express-template
-A template to use when creating express apps.
+# Inventory Mgmt
+
+An inventory management app. Built with the Node.js framework, Express, and PostgreSQL.
