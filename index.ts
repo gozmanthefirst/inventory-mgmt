@@ -1,4 +1,5 @@
 // External Imports
+import dotenv from "dotenv";
 import express from "express";
 import path from "path";
 
@@ -7,7 +8,8 @@ import errorHandler from "./middleware/error";
 import logger from "./middleware/logger";
 import notFound from "./middleware/not-found";
 
-// TODO: CREATE `.env` FILE
+dotenv.config();
+
 const PORT = process.env.PORT || 8000;
 
 // Initialize Express app
