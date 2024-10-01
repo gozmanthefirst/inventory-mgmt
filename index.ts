@@ -1,12 +1,14 @@
 // External Imports
 import dotenv from "dotenv";
 import express from "express";
-import path from "path";
 
 // Local Imports
 import errorHandler from "./middleware/error";
 import logger from "./middleware/logger";
 import notFound from "./middleware/not-found";
+import authorsRouter from "./routes/authors-route";
+import booksRouter from "./routes/books-route";
+import genresRouter from "./routes/genres-route";
 
 dotenv.config();
 
@@ -22,14 +24,10 @@ app.use(express.urlencoded({ extended: true }));
 // Logger Middlewaare
 app.use(logger);
 
-// Config EJS
-app.set("view engine", "ejs");
-app.set("views", path.join(__dirname, "../views"));
-
 // Routes
-app.get("/", (req, res) => {
-  res.send("Hello world!");
-});
+app.use("/books", booksRouter);
+app.use("/authors", authorsRouter);
+app.use("/genres", genresRouter);
 
 // Not Found Routes
 app.use(notFound);
