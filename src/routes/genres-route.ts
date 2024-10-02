@@ -9,10 +9,10 @@ import { getAllGenres, getGenre } from "../controllers/genres-controller";
 // Initialize router
 const genresRouter = Router();
 
-// Get all genres - GET {/genres}/
+// Get all genres - GET {/api/genres}/
 genresRouter.get("/", getAllGenres);
 
-// Get a single genre - GET {/genres}/:id
+// Get a single genre - GET {/api/genres}/:id
 genresRouter.get("/:id", getGenre);
 
 export default genresRouter;

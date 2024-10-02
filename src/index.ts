@@ -1,4 +1,7 @@
 // External Imports
+import compression from "compression";
+import cookieParser from "cookie-parser";
+import cors from "cors";
 import dotenv from "dotenv";
 import express from "express";
 
@@ -17,6 +20,18 @@ const PORT = process.env.PORT || 8000;
 // Initialize Express app
 const app = express();
 
+// CORS
+app.use(
+  cors({
+    origin: ["http://localhost:3000", "http://localhost:3000"],
+    credentials: true,
+  })
+);
+
+// Response compression and Cookie parser
+app.use(compression());
+app.use(cookieParser());
+
 // Body Parser Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -25,9 +40,9 @@ app.use(express.urlencoded({ extended: true }));
 app.use(logger);
 
 // Routes
-app.use("/books", booksRouter);
-app.use("/authors", authorsRouter);
-app.use("/genres", genresRouter);
+app.use("/api/books", booksRouter);
+app.use("/api/authors", authorsRouter);
+app.use("/api/genres", genresRouter);
 
 // Not Found Routes
 app.use(notFound);
@@ -36,5 +51,5 @@ app.use(notFound);
 app.use(errorHandler);
 
 app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
+  console.log(`Server is running on http://localhost/${PORT}`);
 });
