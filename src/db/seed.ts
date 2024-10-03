@@ -13,7 +13,7 @@ if (!dbUrl) {
 }
 
 const createTablesSqlQuery = fs.readFileSync(
-  path.join(__dirname, "../../sql/create-tables.sql"),
+  path.join(__dirname, "../../../sql/create-tables.sql"),
   "utf8"
 );
 
