@@ -16,11 +16,11 @@ const authorsRouter = Router();
 // Get all authors - GET {/api/authors}/
 authorsRouter.get("/", getAllAuthors);
 
-// Get a single author - GET {/api/authors}/:id
-authorsRouter.get("/:id", getAuthor);
-
 // Create a new author - POST {/api/authors}/
 authorsRouter.post("/", createAuthor);
+
+// Get a single author - GET {/api/authors}/:id
+authorsRouter.get("/:id", getAuthor);
 
 // Update a single author - PUT {/api/authors}/:id
 authorsRouter.put("/:id", updateAuthor);

@@ -40,9 +40,9 @@ app.use(express.urlencoded({ extended: true }));
 app.use(logger);
 
 // Routes
-app.use("/api/books", booksRouter);
-app.use("/api/authors", authorsRouter);
-app.use("/api/genres", genresRouter);
+app.use("/api/v1/books", booksRouter);
+app.use("/api/v1/authors", authorsRouter);
+app.use("/api/v1/genres", genresRouter);
 
 // Not Found Routes
 app.use(notFound);
