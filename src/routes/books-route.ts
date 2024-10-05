@@ -15,19 +15,19 @@ import {
 // Initialize router
 const booksRouter = Router();
 
-// Get all books - GET {/api/books}/
+// Get all books - GET {/api/v1/books}/
 booksRouter.get("/", getAllBooks);
 
-// Get a single book - GET {/api/books}/:id
-booksRouter.get("/:id", getBook);
-
-// Create a new book - POST {/api/books}/
+// Create a new book - POST {/api/v1/books}/
 booksRouter.post("/", createBook);
 
-// Update a single book - PUT {/api/books}/:id
+// Get a single book - GET {/api/v1/books}/:id
+booksRouter.get("/:id", getBook);
+
+// Update a single book - PUT {/api/v1/books}/:id
 booksRouter.put("/:id", updateBook);
 
-// Delete a single book - DELETE {/api/books}/:id
+// Delete a single book - DELETE {/api/v1/books}/:id
 booksRouter.delete("/", deleteBook);
 
 export default booksRouter;

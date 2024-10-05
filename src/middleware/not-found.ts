@@ -10,6 +10,8 @@ import { HttpError } from "../interfaces/httpError";
 const notFound: RequestHandler = (req, res, next) => {
   const err: HttpError = new Error(`Not found`);
   err.status = 404;
+  err.code = "NOT_FOUND";
+  err.details = "Route not found.";
   return next(err);
 };
 

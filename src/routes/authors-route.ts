@@ -13,19 +13,19 @@ import {
 // Initialize router
 const authorsRouter = Router();
 
-// Get all authors - GET {/api/authors}/
+// Get all authors - GET {/api/v1/authors}/
 authorsRouter.get("/", getAllAuthors);
 
-// Create a new author - POST {/api/authors}/
+// Create a new author - POST {/api/v1/authors}/
 authorsRouter.post("/", createAuthor);
 
-// Get a single author - GET {/api/authors}/:id
+// Get a single author - GET {/api/v1/authors}/:id
 authorsRouter.get("/:id", getAuthor);
 
-// Update a single author - PUT {/api/authors}/:id
+// Update a single author - PUT {/api/v1/authors}/:id
 authorsRouter.put("/:id", updateAuthor);
 
-// Delete a single author - DELETE {/api/authors}/:id
+// Delete a single author - DELETE {/api/v1/authors}/:id
 authorsRouter.delete("/:id", deleteAuthor);
 
 export default authorsRouter;

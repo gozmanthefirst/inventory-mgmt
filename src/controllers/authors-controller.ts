@@ -20,7 +20,9 @@ import { errorResponse, successResponse } from "../utils/api-response";
 export const getAllAuthors: RequestHandler = async (req, res, next) => {
   try {
     const authors: Author[] = await getAllAuthorsQuery();
-    return res.json(successResponse("Authors successfully retrieved.", authors));
+    return res.json(
+      successResponse("Authors successfully retrieved.", authors)
+    );
   } catch (error) {
     (error as HttpError).status = HttpStatusCode.INTERNAL_SERVER_ERROR;
     return next(error);
@@ -36,7 +38,7 @@ export const createAuthor: RequestHandler = async (req, res, next) => {
     const { name, bio } = req.body;
 
     await createNewAuthorQuery(name, bio);
-    return res.json(successResponse("New author successfully created."));
+    return res.json(successResponse("Author successfully created."));
   } catch (error) {
     (error as HttpError).status = HttpStatusCode.INTERNAL_SERVER_ERROR;
     return next(error);
@@ -104,6 +106,13 @@ export const updateAuthor: RequestHandler = async (req, res, next) => {
       return res
         .status(HttpStatusCode.BAD_REQUEST)
         .json(errorResponse("INVALID_DATA", ["Name is required."]));
+    }
+
+    // Return an error if there's no bio
+    if (!bio) {
+      return res
+        .status(HttpStatusCode.BAD_REQUEST)
+        .json(errorResponse("INVALID_DATA", ["Bio is required."]));
     }
 
     await updateAuthorByIdQuery(

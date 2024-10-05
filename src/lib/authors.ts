@@ -32,7 +32,7 @@ export const updateAuthorByIdQuery = async (
 ) => {
   await pool.query(
     `UPDATE authors
-    SET name = $1, bio = $2
+    SET "name" = $1, bio = $2
      WHERE id = $3`,
     [name, bio, id]
   );
