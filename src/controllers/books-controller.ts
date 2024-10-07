@@ -231,6 +231,8 @@ export const updateBook: RequestHandler = async (req, res, next) => {
       }
     }
 
+    // TODO: If author ID changes, (the authors of a book gets changed), the book_author record for the ex-author doesnt get removed. Fix it.
+
     // Check if authors exist
     for (const authorId of authorIds) {
       const author: Author = await getAuthorByIdQuery(authorId);
@@ -241,6 +243,8 @@ export const updateBook: RequestHandler = async (req, res, next) => {
           .json(errorResponse("NOT_FOUND", "Author not found."));
       }
     }
+
+    // TODO: If genre ID changes, (the genres of a book gets changed), the book_genre record for the ex-genre doesnt get removed. Fix it.
 
     // Check if genres exist
     for (const genreId of genreIds) {

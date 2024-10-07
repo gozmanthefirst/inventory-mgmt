@@ -28,6 +28,6 @@ booksRouter.get("/:id", getBook);
 booksRouter.put("/:id", updateBook);
 
 // Delete a single book - DELETE {/api/v1/books}/:id
-booksRouter.delete("/", deleteBook);
+booksRouter.delete("/:id", deleteBook);
 
 export default booksRouter;
