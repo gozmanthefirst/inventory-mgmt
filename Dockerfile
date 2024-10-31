@@ -21,6 +21,7 @@ COPY . .
 RUN npm run build
 
 # Migrate DB schema to the database
+# Only run in production
 RUN npm run migrate
 
 # Start a new, smaller stage for production deployment

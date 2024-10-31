@@ -10,12 +10,12 @@ services:
       - "8000:8000"
     environment:
       - NODE_ENV=production
-      - DB_HOST=${DB_HOST}
-      - DB_USER=${DB_USER}
-      - DB_PASSWORD=${DB_PASSWORD}
-      - DB_NAME=${DB_NAME}
-      - DB_PORT=${DB_PORT:-5432}
-      - DATABASE_URL=${DATABASE_URL}
+      - DB_HOST=${DOCKER_DB_HOST}
+      - DB_USER=${DOCKER_DB_USER}
+      - DB_PASSWORD=${DOCKER_DB_PASSWORD}
+      - DB_NAME=${DOCKER_DB_NAME}
+      - DB_PORT=${DOCKER_DB_PORT:-5432}
+      - DATABASE_URL=${DOCKER_DATABASE_URL}
     restart: unless-stopped
     depends_on:
       - db
@@ -23,9 +23,9 @@ services:
   db:
     image: postgres:16.2
     environment:
-      - POSTGRES_USER=${DB_USER}
-      - POSTGRES_PASSWORD=${DB_PASSWORD}
-      - POSTGRES_DB=${DB_NAME}
+      - POSTGRES_USER=${DOCKER_DB_USER}
+      - POSTGRES_PASSWORD=${DOCKER_DB_PASSWORD}
+      - POSTGRES_DB=${DOCKER_DB_NAME}
     volumes:
       - app-data:/var/lib/postgresql/data
 
