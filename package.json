@@ -8,7 +8,8 @@
     "prestart": "npm run build",
     "start": "node dist/src/index.js",
     "predev": "npm run build",
-    "dev": "nodemon"
+    "dev": "nodemon",
+    "migrate": "node dist/src/db/migrate.js"
   },
   "keywords": [],
   "author": "",
@@ -31,6 +32,8 @@
     "@types/pg": "^8.11.10",
     "nodemon": "^3.1.4",
     "ts-node": "^10.9.2",
+    "tsc-alias": "^1.8.10",
+    "tsx": "^4.19.1",
     "typescript": "^5.5.4"
   }
 }

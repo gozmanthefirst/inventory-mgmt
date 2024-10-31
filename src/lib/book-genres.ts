@@ -26,3 +26,11 @@ export const createNewBookGenreQuery = async (
     [bookid, genreId]
   );
 };
+
+export const deleteBookGenreQuery = async (bookid: number) => {
+  await pool.query(
+    `DELETE FROM book_genres
+    WHERE book_id = $1`,
+    [bookid]
+  );
+};

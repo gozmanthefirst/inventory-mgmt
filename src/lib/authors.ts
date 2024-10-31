@@ -25,6 +25,16 @@ export const getAuthorByIdQuery = async (id: number) => {
   return rows[0];
 };
 
+export const getAuthorsByBookIdQuery = async (bookId: number) => {
+  const { rows } = await pool.query(
+    `SELECT * FROM authors
+     WHERE book_id = $1`,
+    [bookId]
+  );
+
+  return rows;
+};
+
 export const updateAuthorByIdQuery = async (
   name: string,
   bio: string,

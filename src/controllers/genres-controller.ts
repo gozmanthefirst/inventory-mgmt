@@ -35,8 +35,23 @@ export const createGenre: RequestHandler = async (req, res, next) => {
   try {
     const { name } = req.body;
 
+    //* Required Fields
+    // Check for required fields
+    const requiredFields = [{ name: "Name", value: name }];
+
+    for (const field of requiredFields) {
+      if (!field.value) {
+        return res
+          .status(HttpStatusCode.BAD_REQUEST)
+          .json(errorResponse("INVALID_DATA", [`${field.name} is required.`]));
+      }
+    }
+
     await createNewGenreQuery(name);
-    return res.json(successResponse("Genre successfully created."));
+    
+    return res
+      .status(HttpStatusCode.CREATED)
+      .json(successResponse("Genre successfully created."));
   } catch (error) {
     (error as HttpError).status = HttpStatusCode.INTERNAL_SERVER_ERROR;
     return next(error);
@@ -81,8 +96,8 @@ export const getGenre: RequestHandler = async (req, res, next) => {
 export const updateGenre: RequestHandler = async (req, res, next) => {
   try {
     const id = Number(req.params.id);
-    const { name } = req.body;
 
+    //* Check ID
     // Return an error if id is not a valid number
     if (typeof id !== "number" || isNaN(id)) {
       return res
@@ -90,20 +105,33 @@ export const updateGenre: RequestHandler = async (req, res, next) => {
         .json(errorResponse("INVALID_ID", "Invalid genre id."));
     }
 
+    //* Get Genre
     const genre: Genre = await getGenreByIdQuery(id);
 
-    // Return an error if the genre was not found
+    //* Return an error if the genre was not found
     if (!genre) {
       return res
         .status(HttpStatusCode.NOT_FOUND)
         .json(errorResponse("NOT_FOUND", "Genre not found."));
     }
 
-    // Return an error if there's no name
-    if (!name) {
-      return res
-        .status(HttpStatusCode.BAD_REQUEST)
-        .json(errorResponse("INVALID_DATA", ["Name is required."]));
+    const getValidValue = (input: any, fallback: any) =>
+      input === "" || input === null || input === undefined ? fallback : input;
+
+    //* Get request body details
+    //? To make any field required, just remove the existing genre alternative.
+    const name = getValidValue(req.body.name, genre.name);
+
+    //* Required Fields
+    // Check for required fields
+    const requiredFields = [{ name: "Name", value: name }];
+
+    for (const field of requiredFields) {
+      if (!field.value) {
+        return res
+          .status(HttpStatusCode.BAD_REQUEST)
+          .json(errorResponse("INVALID_DATA", [`${field.name} is required.`]));
+      }
     }
 
     await updateGenreByIdQuery(name ? name : genre.name, id);

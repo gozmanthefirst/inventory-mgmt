@@ -2,11 +2,14 @@
 CREATE TABLE
   IF NOT EXISTS books (
     id SERIAL PRIMARY KEY,
-    title VARCHAR(255) NOT NULL,
-    isbn VARCHAR(13) NOT NULL UNIQUE,
-    pub_year INT, -- publication year
+    title TEXT NOT NULL,
+    isbn VARCHAR(13) UNIQUE,
+    pub_year SMALLINT CHECK (
+      pub_year >= 0
+      AND pub_year <= 9999
+    ), -- publication year
     quantity INT,
-    price DECIMAL(10, 2),
+    price DECIMAL(12, 2),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
   );
@@ -15,7 +18,7 @@ CREATE TABLE
 CREATE TABLE
   IF NOT EXISTS authors (
     id SERIAL PRIMARY KEY,
-    "name" VARCHAR(255) NOT NULL,
+    "name" TEXT NOT NULL,
     bio TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
@@ -25,7 +28,7 @@ CREATE TABLE
 CREATE TABLE
   IF NOT EXISTS genres (
     id SERIAL PRIMARY KEY,
-    "name" VARCHAR(255) NOT NULL UNIQUE,
+    "name" TEXT NOT NULL UNIQUE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
   );

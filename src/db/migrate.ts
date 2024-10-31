@@ -1,0 +1,71 @@
+// External Imports
+import dotenv from "dotenv";
+import fs from "fs";
+import path from "path";
+import { Client } from "pg";
+
+dotenv.config();
+
+const dbUrl = process.env.DATABASE_URL;
+
+if (!dbUrl) {
+  throw new Error("DATABASE_URL environment variable is missing.");
+}
+
+const createTablesSqlQuery = fs.readFileSync(
+  // path.join(__dirname, "../../sql/create-tables.sql"),
+  path.join(__dirname, "../../../sql/create-tables.sql"),
+  "utf8"
+);
+
+const createTables = async () => {
+  console.log("Creating database tables...");
+
+  const client = new Client({
+    connectionString: dbUrl,
+  });
+
+  try {
+    await client.connect();
+    console.log("Connected to the database.");
+
+    await client.query(createTablesSqlQuery);
+    console.log("Necessary tables created.");
+  } catch (error) {
+    console.error("Error during database operation:", error);
+  } finally {
+    await client.end();
+    console.log("Database connection closed.");
+  }
+};
+
+createTables();
+
+// const alterTablesSqlQuery = fs.readFileSync(
+//   path.join(__dirname, "../../sql/alter-tables.sql"),
+//   path.join(__dirname, "../../../sql/alter-tables.sql"),
+//   "utf8"
+// );
+
+// const alterTables = async () => {
+//   console.log("Altering database tables...");
+
+//   const client = new Client({
+//     connectionString: dbUrl,
+//   });
+
+//   try {
+//     await client.connect();
+//     console.log("Connected to the database.");
+
+//     await client.query(alterTablesSqlQuery);
+//     console.log("Necessary tables and columns altered.");
+//   } catch (error) {
+//     console.error("Error during database operation:", error);
+//   } finally {
+//     await client.end();
+//     console.log("Database connection closed.");
+//   }
+// };
+
+// alterTables();

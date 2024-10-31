@@ -27,3 +27,11 @@ export const createNewBookAuthorQuery = async (
     [bookid, authorId]
   );
 };
+
+export const deleteBookAuthorQuery = async (bookid: number) => {
+  await pool.query(
+    `DELETE FROM book_authors
+    WHERE book_id = $1`,
+    [bookid]
+  );
+};

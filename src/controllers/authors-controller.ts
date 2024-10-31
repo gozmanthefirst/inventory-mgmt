@@ -37,8 +37,23 @@ export const createAuthor: RequestHandler = async (req, res, next) => {
   try {
     const { name, bio } = req.body;
 
+    //* Required Fields
+    // Check for required fields
+    const requiredFields = [{ name: "Name", value: name }];
+
+    for (const field of requiredFields) {
+      if (!field.value) {
+        return res
+          .status(HttpStatusCode.BAD_REQUEST)
+          .json(errorResponse("INVALID_DATA", [`${field.name} is required.`]));
+      }
+    }
+
     await createNewAuthorQuery(name, bio);
-    return res.json(successResponse("Author successfully created."));
+    
+    return res
+      .status(HttpStatusCode.CREATED)
+      .json(successResponse("Author successfully created."));
   } catch (error) {
     (error as HttpError).status = HttpStatusCode.INTERNAL_SERVER_ERROR;
     return next(error);
@@ -83,8 +98,8 @@ export const getAuthor: RequestHandler = async (req, res, next) => {
 export const updateAuthor: RequestHandler = async (req, res, next) => {
   try {
     const id = Number(req.params.id);
-    const { name, bio } = req.body;
 
+    //* Check ID
     // Return an error if id is not a valid number
     if (typeof id !== "number" || isNaN(id)) {
       return res
@@ -92,34 +107,37 @@ export const updateAuthor: RequestHandler = async (req, res, next) => {
         .json(errorResponse("INVALID_ID", "Invalid author id."));
     }
 
+    //* Get Author
     const author: Author = await getAuthorByIdQuery(id);
 
-    // Return an error if the author was not found
+    //* Return an error if the author was not found
     if (!author) {
       return res
         .status(HttpStatusCode.NOT_FOUND)
         .json(errorResponse("NOT_FOUND", "Author not found."));
     }
 
-    // Return an error if there's no name
-    if (!name) {
-      return res
-        .status(HttpStatusCode.BAD_REQUEST)
-        .json(errorResponse("INVALID_DATA", ["Name is required."]));
+    const getValidValue = (input: any, fallback: any) =>
+      input === "" || input === null || input === undefined ? fallback : input;
+
+    //* Get request body details
+    //? To make any field required, just remove the existing author alternative.
+    const name = getValidValue(req.body.name, author.name);
+    const bio = getValidValue(req.body.bio, author.bio);
+
+    //* Required Fields
+    // Check for required fields
+    const requiredFields = [{ name: "Name", value: name }];
+
+    for (const field of requiredFields) {
+      if (!field.value) {
+        return res
+          .status(HttpStatusCode.BAD_REQUEST)
+          .json(errorResponse("INVALID_DATA", [`${field.name} is required.`]));
+      }
     }
 
-    // Return an error if there's no bio
-    if (!bio) {
-      return res
-        .status(HttpStatusCode.BAD_REQUEST)
-        .json(errorResponse("INVALID_DATA", ["Bio is required."]));
-    }
-
-    await updateAuthorByIdQuery(
-      name ? name : author.name,
-      bio ? bio : author.bio,
-      id
-    );
+    await updateAuthorByIdQuery(name, bio, id);
 
     return res.json(successResponse("Author successfully updated."));
   } catch (error) {
