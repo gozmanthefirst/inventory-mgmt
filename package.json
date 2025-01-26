@@ -4,10 +4,10 @@
   "description": "A template to use when creating express apps.",
   "main": "dist/index.js",
   "scripts": {
-    "build": "rimraf dist && npx tsc",
-    "prestart": "npm run build",
+    "build": "rimraf dist && pnpm tsc",
+    "prestart": "pnpm run build",
     "start": "node dist/src/index.js",
-    "predev": "npm run build",
+    "predev": "pnpm run build",
     "dev": "nodemon",
     "migrate": "node dist/src/db/migrate.js"
   },
