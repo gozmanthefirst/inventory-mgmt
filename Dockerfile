@@ -20,12 +20,8 @@ COPY . .
 # Build the TypeScript app
 RUN npm run build
 
-# Migrate DB schema to the database
-# Only run in production
-RUN npm run migrate
-
 # Start a new, smaller stage for production deployment
-FROM node:20-alpine AS production
+FROM build AS production
 
 # Set working directory
 WORKDIR /app
@@ -35,6 +31,7 @@ COPY --from=build /app/package.json ./
 COPY --from=build /app/yarn.lock* /app/package-lock.json* /app/pnpm-lock.yaml* ./
 COPY --from=build /app/dist ./dist
 COPY --from=build /app/sql ./sql
+COPY --from=build /app/.env ./
 
 # Install only production dependencies
 RUN \
