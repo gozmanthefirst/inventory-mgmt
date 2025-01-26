@@ -13,7 +13,6 @@ if (!dbUrl) {
 }
 
 const createTablesSqlQuery = fs.readFileSync(
-  // path.join(__dirname, "../../sql/create-tables.sql"),
   path.join(__dirname, "../../../sql/create-tables.sql"),
   "utf8"
 );
@@ -40,6 +39,34 @@ const createTables = async () => {
 };
 
 createTables();
+
+// const dropTablesSqlQuery = fs.readFileSync(
+//   path.join(__dirname, "../../../sql/drop-tables.sql"),
+//   "utf8"
+// );
+
+// const dropTables = async () => {
+//   console.log("dropping database tables...");
+
+//   const client = new Client({
+//     connectionString: dbUrl,
+//   });
+
+//   try {
+//     await client.connect();
+//     console.log("Connected to the database.");
+
+//     await client.query(dropTablesSqlQuery);
+//     console.log("Tables dropped.");
+//   } catch (error) {
+//     console.error("Error during database operation:", error);
+//   } finally {
+//     await client.end();
+//     console.log("Database connection closed.");
+//   }
+// };
+
+// dropTables();
 
 // const alterTablesSqlQuery = fs.readFileSync(
 //   path.join(__dirname, "../../sql/alter-tables.sql"),
