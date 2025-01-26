@@ -12,6 +12,7 @@ if (!dbUrl) {
   throw new Error("DATABASE_URL environment variable is missing.");
 }
 
+//* Create Tables
 const createTablesSqlQuery = fs.readFileSync(
   path.join(__dirname, "../../../sql/create-tables.sql"),
   "utf8"
@@ -38,61 +39,62 @@ const createTables = async () => {
   }
 };
 
-createTables();
+// createTables();
 
-// const dropTablesSqlQuery = fs.readFileSync(
-//   path.join(__dirname, "../../../sql/drop-tables.sql"),
-//   "utf8"
-// );
+//* Drop Tables
+const dropTablesSqlQuery = fs.readFileSync(
+  path.join(__dirname, "../../../sql/drop-tables.sql"),
+  "utf8"
+);
 
-// const dropTables = async () => {
-//   console.log("dropping database tables...");
+const dropTables = async () => {
+  console.log("dropping database tables...");
 
-//   const client = new Client({
-//     connectionString: dbUrl,
-//   });
+  const client = new Client({
+    connectionString: dbUrl,
+  });
 
-//   try {
-//     await client.connect();
-//     console.log("Connected to the database.");
+  try {
+    await client.connect();
+    console.log("Connected to the database.");
 
-//     await client.query(dropTablesSqlQuery);
-//     console.log("Tables dropped.");
-//   } catch (error) {
-//     console.error("Error during database operation:", error);
-//   } finally {
-//     await client.end();
-//     console.log("Database connection closed.");
-//   }
-// };
+    await client.query(dropTablesSqlQuery);
+    console.log("Tables dropped.");
+  } catch (error) {
+    console.error("Error during database operation:", error);
+  } finally {
+    await client.end();
+    console.log("Database connection closed.");
+  }
+};
 
 // dropTables();
 
-// const alterTablesSqlQuery = fs.readFileSync(
-//   path.join(__dirname, "../../sql/alter-tables.sql"),
-//   path.join(__dirname, "../../../sql/alter-tables.sql"),
-//   "utf8"
-// );
+//* Alter Tables
+const alterTablesSqlQuery = fs.readFileSync(
+  path.join(__dirname, "../../../sql/alter-tables.sql"),
+  "utf8"
+);
 
-// const alterTables = async () => {
-//   console.log("Altering database tables...");
+const alterTables = async () => {
+  console.log("Altering database tables...");
 
-//   const client = new Client({
-//     connectionString: dbUrl,
-//   });
+  const client = new Client({
+    connectionString: dbUrl,
+  });
 
-//   try {
-//     await client.connect();
-//     console.log("Connected to the database.");
+  try {
+    await client.connect();
+    console.log("Connected to the database.");
 
-//     await client.query(alterTablesSqlQuery);
-//     console.log("Necessary tables and columns altered.");
-//   } catch (error) {
-//     console.error("Error during database operation:", error);
-//   } finally {
-//     await client.end();
-//     console.log("Database connection closed.");
-//   }
-// };
+    await client.query(alterTablesSqlQuery);
+    console.log("Necessary tables and columns altered.");
+  } catch (error) {
+    console.error("Error during database operation:", error);
+  } finally {
+    await client.end();
+    console.log("Database connection closed.");
+  }
+};
 
 // alterTables();
