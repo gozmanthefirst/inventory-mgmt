@@ -69,6 +69,7 @@ const dropTables = async () => {
 };
 
 // dropTables();
+// createTables();
 
 //* Alter Tables
 const alterTablesSqlQuery = fs.readFileSync(
