@@ -7,7 +7,6 @@ import {
   deleteBook,
   getAllBooks,
   getBook,
-  updateBook,
 } from "../controllers/books-controller";
 
 // Local Imports
@@ -23,9 +22,6 @@ booksRouter.post("/", createBook);
 
 // Get a single book - GET {/api/v1/books}/:id
 booksRouter.get("/:id", getBook);
-
-// Update a single book - PUT {/api/v1/books}/:id
-booksRouter.put("/:id", updateBook);
 
 // Delete a single book - DELETE {/api/v1/books}/:id
 booksRouter.delete("/:id", deleteBook);
