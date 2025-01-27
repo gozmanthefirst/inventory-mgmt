@@ -17,13 +17,13 @@ export const getBookGenresByBookIdQuery = async (bookId: number) => {
 };
 
 export const createNewBookGenreQuery = async (
-  bookid: number,
+  bookId: number,
   genreId: number
 ) => {
   await pool.query(
     `INSERT INTO book_genres (book_id, genre_id)
    VALUES ($1, $2)`,
-    [bookid, genreId]
+    [bookId, genreId]
   );
 };
 

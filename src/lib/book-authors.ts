@@ -13,18 +13,17 @@ export const getBookAuthorsByBookIdQuery = async (bookId: number) => {
   return rows.map((row) => ({
     id: row.author_id as number,
     name: row.name as string,
-    bio: row.bio as string,
   }));
 };
 
 export const createNewBookAuthorQuery = async (
-  bookid: number,
+  bookId: number,
   authorId: number
 ) => {
   await pool.query(
     `INSERT INTO book_authors (book_id, author_id)
    VALUES ($1, $2)`,
-    [bookid, authorId]
+    [bookId, authorId]
   );
 };
 

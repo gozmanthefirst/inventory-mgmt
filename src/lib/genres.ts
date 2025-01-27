@@ -8,18 +8,21 @@ export const getAllGenresQuery = async () => {
 };
 
 export const createNewGenreQuery = async (name: string) => {
-  await pool.query(
-    `INSERT INTO genres ("name")
-   VALUES ($1)`,
+  const { rows } = await pool.query(
+    `INSERT INTO genres (genre_name)
+   VALUES ($1)
+   RETURNING id`,
     [name]
   );
+
+  return Number(rows[0].id);
 };
 
-export const getGenreByIdQuery = async (id: number) => {
+export const getGenreByNameQuery = async (name: string) => {
   const { rows } = await pool.query(
     `SELECT * FROM genres
-     WHERE id = $1`,
-    [id]
+     WHERE genre_name = $1`,
+    [name]
   );
 
   return rows[0];
