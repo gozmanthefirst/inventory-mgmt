@@ -5,8 +5,7 @@ CREATE TABLE IF NOT EXISTS books (
   subtitle TEXT NOT NULL DEFAULT '',
   book_desc TEXT NOT NULL DEFAULT '',
   image_url TEXT NOT NULL DEFAULT '',
-  isbn_10 VARCHAR(10) UNIQUE NOT NULL,
-  isbn_13 VARCHAR(13) UNIQUE NOT NULL,
+  isbn VARCHAR(13) UNIQUE NOT NULL,
   publisher TEXT NOT NULL,
   published_date DATE NOT NULL,
   page_count INT NOT NULL,
@@ -19,7 +18,7 @@ CREATE TABLE IF NOT EXISTS books (
 --* Create authors table
 CREATE TABLE IF NOT EXISTS authors (
   id SERIAL PRIMARY KEY,
-  author_name TEXT NOT NULL,
+  author_name TEXT NOT NULL UNIQUE,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
@@ -31,14 +30,6 @@ CREATE TABLE IF NOT EXISTS genres (
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
-
---* Create the function to auto-update `updated_at` for genres table
-CREATE OR REPLACE FUNCTION update_genres_updated_at () RETURNS TRIGGER AS '
-BEGIN
-  NEW.updated_at = NOW();
-  RETURN NEW;
-END;
-' LANGUAGE plpgsql;
 
 --* Create book_authors junction table
 CREATE TABLE IF NOT EXISTS book_authors (
