@@ -10,28 +10,32 @@ export enum HttpStatusCode {
   SERVICE_UNAVAILABLE = 503,
 }
 
-export type Author = {
+export type Book = {
   id: number;
-  name: string;
-  bio: string;
+  title: string;
+  subtitle: string;
+  book_desc: string;
+  image_url: string;
+  isbn: string;
+  publisher: number;
+  published_date: Date;
+  page_count: number;
+  available_as_epub: boolean;
+  available_as_pdf: boolean;
   created_at: Date;
   updated_at: Date;
 };
 
-export type Book = {
+export type Author = {
   id: number;
-  title: string;
-  isbn: string;
-  pub_year: number;
-  quantity: number;
-  price: number;
+  author_name: string;
   created_at: Date;
   updated_at: Date;
 };
 
 export type Genre = {
   id: number;
-  name: string;
+  genre_name: string;
   created_at: Date;
   updated_at: Date;
 };
