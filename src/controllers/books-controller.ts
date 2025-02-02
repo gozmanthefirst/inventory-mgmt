@@ -4,9 +4,21 @@ import { RequestHandler } from "express";
 // Local Imports
 import { Author, Book, Genre, HttpStatusCode } from "../../types";
 import { HttpError } from "../interfaces/httpError";
-import { createNewAuthorQuery, getAuthorByNameQuery } from "../lib/authors";
-import { createNewBookAuthorQuery } from "../lib/book-authors";
-import { createNewBookGenreQuery } from "../lib/book-genres";
+import {
+  createNewAuthorQuery,
+  deleteAuthorByIdQuery,
+  getAuthorByNameQuery,
+} from "../lib/authors";
+import {
+  createNewBookAuthorQuery,
+  getAuthorIdByBookIdQuery,
+  getBookIdByAuthorIdQuery,
+} from "../lib/book-authors";
+import {
+  createNewBookGenreQuery,
+  getBookIdByGenreIdQuery,
+  getGenreIdByBookIdQuery,
+} from "../lib/book-genres";
 import {
   createNewBookQuery,
   deleteBookByIdQuery,
@@ -14,7 +26,11 @@ import {
   getBookByIdQuery,
   getBookByIsbn,
 } from "../lib/books";
-import { createNewGenreQuery, getGenreByNameQuery } from "../lib/genres";
+import {
+  createNewGenreQuery,
+  deleteGenreByIdQuery,
+  getGenreByNameQuery,
+} from "../lib/genres";
 import { errorResponse, successResponse } from "../utils/api-response";
 import { isValidPastDate } from "../utils/datetime";
 import { removeDashesAndSpaces } from "../utils/string";
@@ -26,7 +42,6 @@ import { removeDashesAndSpaces } from "../utils/string";
 export const getAllBooks: RequestHandler = async (req, res, next) => {
   try {
     const books: Book[] = await getAllBooksQuery();
-
     return res.json(successResponse("Books successfully retrieved.", books));
   } catch (error) {
     (error as HttpError).status = HttpStatusCode.INTERNAL_SERVER_ERROR;
@@ -103,7 +118,7 @@ export const createBook: RequestHandler = async (req, res, next) => {
 
     // ISBN-10: 10 chars, first 9 are digits, last can be digit or 'X'
     if (modifiedIsbn.length === 10) {
-      isIsbnValid = /^\d{9}[\dX]$/.test(modifiedIsbn); //! This still doesn't account for a lowercase 'x'. Will fix.
+      isIsbnValid = /^\d{9}[\dXx]$/.test(modifiedIsbn);
     }
 
     // ISBN-13: 13 digits only
@@ -150,19 +165,25 @@ export const createBook: RequestHandler = async (req, res, next) => {
         .json(errorResponse("INVALID_DATA", ["Invalid page count."]));
     }
 
-    // //* Available as ePub
-    // if (availableAsEpub === true && availableAsEpub === false) {
-    //   return res
-    //     .status(HttpStatusCode.BAD_REQUEST)
-    //     .json(errorResponse("INVALID_DATA", ["Invalid ePub availability."]));
-    // }
+    //* Available as ePub
+    if (typeof availableAsEpub !== "boolean") {
+      return res
+        .status(HttpStatusCode.BAD_REQUEST)
+        .json(
+          errorResponse("INVALID_DATA", [
+            "ePub availability must be a boolean.",
+          ])
+        );
+    }
 
-    // //* Available as PDF
-    // if (availableAsPdf === true && availableAsPdf === false) {
-    //   return res
-    //     .status(HttpStatusCode.BAD_REQUEST)
-    //     .json(errorResponse("INVALID_DATA", ["Invalid PDF availability."]));
-    // }
+    //* Available as PDF
+    if (typeof availableAsPdf !== "boolean") {
+      return res
+        .status(HttpStatusCode.BAD_REQUEST)
+        .json(
+          errorResponse("INVALID_DATA", ["PDF availability must be a boolean."])
+        );
+    }
 
     //* Authors
     // Check if authors is an array
@@ -191,6 +212,13 @@ export const createBook: RequestHandler = async (req, res, next) => {
             errorResponse("INVALID_DATA", [
               "Each Author must be a valid string.",
             ])
+          );
+      }
+      if (typeof author === "string" && author.length === 0) {
+        return res
+          .status(HttpStatusCode.BAD_REQUEST)
+          .json(
+            errorResponse("INVALID_DATA", ["Author cannot be an empty string."])
           );
       }
 
@@ -222,6 +250,13 @@ export const createBook: RequestHandler = async (req, res, next) => {
             errorResponse("INVALID_DATA", [
               "Each Genre must be a valid string.",
             ])
+          );
+      }
+      if (typeof genre === "string" && genre.length === 0) {
+        return res
+          .status(HttpStatusCode.BAD_REQUEST)
+          .json(
+            errorResponse("INVALID_DATA", ["Genre cannot be an empty string."])
           );
       }
 
@@ -351,7 +386,36 @@ export const deleteBook: RequestHandler = async (req, res, next) => {
         .json(errorResponse("NOT_FOUND", "Book not found."));
     }
 
+    // Get the ID(s) of the author(s) of the book
+    const bookAuthorsIds = await getAuthorIdByBookIdQuery(book.id);
+
+    // Get the ID(s) of the genre(s) of the book
+    const bookGenresIds = await getGenreIdByBookIdQuery(book.id);
+
+    // Delete book
     await deleteBookByIdQuery(id);
+
+    // Check if the authors of the deleted book have any other book
+    bookAuthorsIds.forEach(async (item) => {
+      const authorId = Number(item.author_id);
+      const bookIds = await getBookIdByAuthorIdQuery(authorId);
+
+      // If the author doesn't have any other book, delete them from the author table
+      if (bookIds.length === 0) {
+        await deleteAuthorByIdQuery(authorId);
+      }
+    });
+
+    // Check if the genres of the deleted book have any other book
+    bookGenresIds.forEach(async (item) => {
+      const genreId = Number(item.genre_id);
+      const bookIds = await getBookIdByGenreIdQuery(genreId);
+
+      // If the genre doesn't have any other book, delete them from the genre table
+      if (bookIds.length === 0) {
+        await deleteGenreByIdQuery(genreId);
+      }
+    });
 
     return res.json(successResponse("Book successfully deleted."));
   } catch (error) {

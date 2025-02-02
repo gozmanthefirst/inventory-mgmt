@@ -60,21 +60,21 @@ export const getBookByIsbn = async (isbn: string) => {
   return rows[0];
 };
 
-export const updateBookByIdQuery = async (
-  title: string,
-  isbn: string,
-  pub_year: number,
-  quantity: number,
-  price: number,
-  id: number
-) => {
-  await pool.query(
-    `UPDATE books
-    SET title = $1, isbn = $2, pub_year = $3, quantity = $4, price = $5
-     WHERE id = $6`,
-    [title, isbn, pub_year, quantity, price, id]
-  );
-};
+// export const updateBookByIdQuery = async (
+//   title: string,
+//   isbn: string,
+//   pub_year: number,
+//   quantity: number,
+//   price: number,
+//   id: number
+// ) => {
+//   await pool.query(
+//     `UPDATE books
+//     SET title = $1, isbn = $2, pub_year = $3, quantity = $4, price = $5
+//      WHERE id = $6`,
+//     [title, isbn, pub_year, quantity, price, id]
+//   );
+// };
 
 export const deleteBookByIdQuery = async (id: number) => {
   await pool.query(
