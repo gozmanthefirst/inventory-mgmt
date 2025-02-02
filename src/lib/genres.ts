@@ -28,15 +28,6 @@ export const getGenreByNameQuery = async (name: string) => {
   return rows[0];
 };
 
-export const updateGenreByIdQuery = async (name: string, id: number) => {
-  await pool.query(
-    `UPDATE genres
-    SET "name" = $1
-     WHERE id = $2`,
-    [name, id]
-  );
-};
-
 export const deleteGenreByIdQuery = async (id: number) => {
   await pool.query(
     `DELETE FROM genres
