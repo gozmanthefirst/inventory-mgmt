@@ -16,6 +16,26 @@ export const getBookGenresByBookIdQuery = async (bookId: number) => {
   }));
 };
 
+export const getGenreIdByBookIdQuery = async (bookId: number) => {
+  const { rows } = await pool.query(
+    `SELECT genre_id FROM book_genres
+    WHERE book_id = $1`,
+    [bookId]
+  );
+
+  return rows;
+};
+
+export const getBookIdByGenreIdQuery = async (genreId: number) => {
+  const { rows } = await pool.query(
+    `SELECT book_id FROM book_genres
+    WHERE genre_id = $1`,
+    [genreId]
+  );
+
+  return rows;
+};
+
 export const createNewBookGenreQuery = async (
   bookId: number,
   genreId: number
@@ -24,13 +44,5 @@ export const createNewBookGenreQuery = async (
     `INSERT INTO book_genres (book_id, genre_id)
    VALUES ($1, $2)`,
     [bookId, genreId]
-  );
-};
-
-export const deleteBookGenreQuery = async (bookid: number) => {
-  await pool.query(
-    `DELETE FROM book_genres
-    WHERE book_id = $1`,
-    [bookid]
   );
 };
