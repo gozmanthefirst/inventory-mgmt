@@ -333,11 +333,11 @@ export const searchBook: RequestHandler = async (req, res, next) => {
         publisher: book.volumeInfo.publisher,
         publishedDate: book.volumeInfo.publishedDate,
         isbn10:
-          book.volumeInfo.industryIdentifiers.find(
+          book.volumeInfo.industryIdentifiers?.find(
             (identifier) => identifier.type === "ISBN_10"
           )?.identifier || "",
         isbn13:
-          book.volumeInfo.industryIdentifiers.find(
+          book.volumeInfo.industryIdentifiers?.find(
             (identifier) => identifier.type === "ISBN_13"
           )?.identifier || "",
         pageCount: book.volumeInfo.pageCount,
