@@ -37,7 +37,7 @@ COPY --from=build /app/.env ./
 RUN \
   if [ -f yarn.lock ]; then yarn install --production --frozen-lockfile; \
   elif [ -f package-lock.json ]; then npm ci --omit=dev; \
-  elif [ -f pnpm-lock.yaml ]; then corepack enable pnpm && pnpm install --prod --frozen-lockfile; \
+  elif [ -f pnpm-lock.yaml ]; then npm install -g pnpm && pnpm install --prod --frozen-lockfile; \
   fi
 
 # Set the environment variable
