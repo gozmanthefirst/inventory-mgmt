@@ -18,6 +18,9 @@ export const searchBooks = async (query: string) => {
         langRestrict: "en",
         orderBy: "relevance",
       },
+      headers: {
+        "Accept-Language": "en",
+      },
     });
 
     return response.data.items || [];
