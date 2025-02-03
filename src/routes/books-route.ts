@@ -7,6 +7,7 @@ import {
   deleteBook,
   getAllBooks,
   getBook,
+  searchBook,
 } from "../controllers/books-controller";
 
 // Local Imports
@@ -19,6 +20,9 @@ booksRouter.get("/", getAllBooks);
 
 // Create a new book - POST {/api/v1/books}/
 booksRouter.post("/", createBook);
+
+// Search for a book - GET {/api/v1/books}/search
+booksRouter.get("/search", searchBook);
 
 // Get a single book - GET {/api/v1/books}/:id
 booksRouter.get("/:id", getBook);

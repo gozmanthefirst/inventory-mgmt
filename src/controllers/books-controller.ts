@@ -2,6 +2,7 @@
 import { RequestHandler } from "express";
 
 // Local Imports
+import { BookSearchResult } from "../../types/google-books";
 import { Author, Book, Genre, HttpStatusCode } from "../../types/shared-types";
 import { HttpError } from "../interfaces/httpError";
 import {
@@ -31,6 +32,7 @@ import {
   deleteGenreByIdQuery,
   getGenreByNameQuery,
 } from "../lib/genres";
+import { searchBooks } from "../services/google-books";
 import { errorResponse, successResponse } from "../utils/api-response";
 import { isValidPastDate } from "../utils/datetime";
 import { removeDashesAndSpaces } from "../utils/string";
@@ -257,7 +259,7 @@ export const createBook: RequestHandler = async (req, res, next) => {
       pageCount,
       finalSubtitle,
       finalBookDesc,
-      finalImageUrl,
+      finalImageUrl
     );
 
     // Add the book-author relationship in the join table
@@ -299,6 +301,58 @@ export const createBook: RequestHandler = async (req, res, next) => {
     return res
       .status(HttpStatusCode.CREATED)
       .json(successResponse("Book successfully created."));
+  } catch (error) {
+    (error as HttpError).status = HttpStatusCode.INTERNAL_SERVER_ERROR;
+    return next(error);
+  }
+};
+
+/**
+ * Search for a book
+ * @route GET /search
+ */
+export const searchBook: RequestHandler = async (req, res, next) => {
+  try {
+    const query = req.query.q as string;
+
+    if (!query) {
+      return res
+        .status(HttpStatusCode.BAD_REQUEST)
+        .json(errorResponse("MISSING_QUERY", "Search query is required."));
+    }
+
+    let result = await searchBooks(query);
+
+    const formattedResult: BookSearchResult[] = result.map((book) => {
+      const formattedBook = {
+        id: book.id,
+        title: book.volumeInfo.title,
+        subtitle: book.volumeInfo.subtitle || "",
+        authors: book.volumeInfo.authors,
+        description: book.volumeInfo.description || "",
+        publisher: book.volumeInfo.publisher,
+        publishedDate: book.volumeInfo.publishedDate,
+        isbn10:
+          book.volumeInfo.industryIdentifiers.find(
+            (identifier) => identifier.type === "ISBN_10"
+          )?.identifier || "",
+        isbn13:
+          book.volumeInfo.industryIdentifiers.find(
+            (identifier) => identifier.type === "ISBN_13"
+          )?.identifier || "",
+        pageCount: book.volumeInfo.pageCount,
+        categories: book.volumeInfo.categories,
+        image: book.volumeInfo.imageLinks?.thumbnail || "",
+      };
+
+      return formattedBook;
+    });
+
+    const finalResult = formattedResult.filter((book) => book.pageCount > 0);
+
+    return res.json(
+      successResponse("Book search results gotten.", finalResult)
+    );
   } catch (error) {
     (error as HttpError).status = HttpStatusCode.INTERNAL_SERVER_ERROR;
     return next(error);

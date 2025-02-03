@@ -3,7 +3,7 @@ export type GoogleBookVolume = {
   volumeInfo: {
     title: string;
     subtitle?: string;
-    authors?: string[];
+    authors: string[];
     publisher: string;
     publishedDate: string;
     description?: string;
@@ -19,7 +19,23 @@ export type GoogleBookVolume = {
   };
 };
 
+export type BookSearchResult = {
+  id: string;
+  title: string;
+  subtitle?: string;
+  authors: string[];
+  description?: string;
+  publisher: string;
+  publishedDate: string;
+  isbn10: string;
+  isbn13: string;
+  pageCount: number;
+  categories: string[];
+  image?: string;
+};
+
 export type GoogleBookResponse = {
   items: GoogleBookVolume[];
   totalItems: number;
+  kind: string;
 };
