@@ -15,6 +15,8 @@ export const searchBooks = async (query: string) => {
       params: {
         q: query,
         key: process.env.GOOGLE_BOOKS_API_KEY,
+        langRestrict: "en",
+        orderBy: "relevance",
       },
     });
 
