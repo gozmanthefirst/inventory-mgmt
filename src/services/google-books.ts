@@ -19,7 +19,7 @@ export const searchBooks = async (query: string) => {
         orderBy: "relevance",
       },
       headers: {
-        "Accept-Language": "en",
+        "Accept-Language": "en-US",
       },
     });
 
