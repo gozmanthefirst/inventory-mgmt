@@ -15,12 +15,10 @@ export const createNewBookQuery = async (
   pageCount: number,
   subtitle?: string,
   bookDesc?: string,
-  imageUrl?: string,
-  availableAsEpub?: boolean,
-  availableAsPdf?: boolean
+  imageUrl?: string
 ) => {
   const { rows } = await pool.query(
-    `INSERT INTO books (title, subtitle, book_desc, image_url, isbn, publisher, published_date, page_count, available_as_epub, available_as_pdf)
+    `INSERT INTO books (title, subtitle, book_desc, image_url, isbn, publisher, published_date, page_count)
    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
    RETURNING id`,
     [
@@ -32,8 +30,6 @@ export const createNewBookQuery = async (
       publisher,
       publishedDate,
       pageCount,
-      availableAsEpub,
-      availableAsPdf,
     ]
   );
 

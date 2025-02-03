@@ -2,10 +2,10 @@
 import { RequestHandler } from "express";
 
 // Local Imports
+import { Genre, HttpStatusCode } from "../../types/shared-types";
 import { HttpError } from "../interfaces/httpError";
 import { getAllGenresQuery } from "../lib/genres";
 import { successResponse } from "../utils/api-response";
-import { Genre, HttpStatusCode } from "../../types";
 
 /**
  * Gets all the genres

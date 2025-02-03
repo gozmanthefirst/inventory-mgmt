@@ -20,8 +20,6 @@ export type Book = {
   publisher: number;
   published_date: Date;
   page_count: number;
-  available_as_epub: boolean;
-  available_as_pdf: boolean;
   created_at: Date;
   updated_at: Date;
 };

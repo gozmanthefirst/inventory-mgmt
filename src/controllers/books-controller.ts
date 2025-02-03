@@ -2,7 +2,7 @@
 import { RequestHandler } from "express";
 
 // Local Imports
-import { Author, Book, Genre, HttpStatusCode } from "../../types";
+import { Author, Book, Genre, HttpStatusCode } from "../../types/shared-types";
 import { HttpError } from "../interfaces/httpError";
 import {
   createNewAuthorQuery,
@@ -64,8 +64,6 @@ export const createBook: RequestHandler = async (req, res, next) => {
       publisher,
       publishedDate,
       pageCount,
-      availableAsEpub,
-      availableAsPdf,
       authors,
       genres,
     } = req.body;
@@ -165,26 +163,6 @@ export const createBook: RequestHandler = async (req, res, next) => {
         .json(errorResponse("INVALID_DATA", ["Invalid page count."]));
     }
 
-    //* Available as ePub
-    if (typeof availableAsEpub !== "boolean") {
-      return res
-        .status(HttpStatusCode.BAD_REQUEST)
-        .json(
-          errorResponse("INVALID_DATA", [
-            "ePub availability must be a boolean.",
-          ])
-        );
-    }
-
-    //* Available as PDF
-    if (typeof availableAsPdf !== "boolean") {
-      return res
-        .status(HttpStatusCode.BAD_REQUEST)
-        .json(
-          errorResponse("INVALID_DATA", ["PDF availability must be a boolean."])
-        );
-    }
-
     //* Authors
     // Check if authors is an array
     if (!Array.isArray(authors)) {
@@ -267,8 +245,6 @@ export const createBook: RequestHandler = async (req, res, next) => {
     const finalSubtitle = subtitle ? subtitle : "";
     const finalBookDesc = bookDesc ? bookDesc : "";
     const finalImageUrl = imageUrl ? imageUrl : "";
-    const finalEpub = availableAsEpub ? availableAsEpub : false;
-    const finalPdf = availableAsPdf ? availableAsPdf : false;
     const finalPubDate = new Date(publishedDate);
 
     //* Create book and return book ID
@@ -282,8 +258,6 @@ export const createBook: RequestHandler = async (req, res, next) => {
       finalSubtitle,
       finalBookDesc,
       finalImageUrl,
-      finalEpub,
-      finalPdf
     );
 
     // Add the book-author relationship in the join table

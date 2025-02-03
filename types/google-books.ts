@@ -1,4 +1,4 @@
-export type Volume = {
+export type GoogleBookVolume = {
   id: string;
   volumeInfo: {
     title: string;
@@ -19,7 +19,7 @@ export type Volume = {
   };
 };
 
-export type Response = {
-  items: Volume[];
+export type GoogleBookResponse = {
+  items: GoogleBookVolume[];
   totalItems: number;
 };

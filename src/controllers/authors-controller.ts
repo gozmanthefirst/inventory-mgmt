@@ -2,7 +2,7 @@
 import { RequestHandler } from "express";
 
 // Local Imports
-import { Author, HttpStatusCode } from "../../types";
+import { Author, HttpStatusCode } from "../../types/shared-types";
 import { HttpError } from "../interfaces/httpError";
 import { getAllAuthorsQuery } from "../lib/authors";
 import { successResponse } from "../utils/api-response";
