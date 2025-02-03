@@ -1,5 +1,3 @@
 -- Alter authors table
-ALTER TABLE authors DROP COLUMN author_name;
-
-ALTER TABLE authors
-ADD COLUMN author_name TEXT NOT NULL UNIQUE;
+ALTER TABLE books DROP COLUMN available_as_epub;
+ALTER TABLE books DROP COLUMN available_as_pdf;

@@ -39,8 +39,6 @@ const createTables = async () => {
   }
 };
 
-// createTables();
-
 //* Drop Tables
 const dropTablesSqlQuery = fs.readFileSync(
   path.join(__dirname, "../../../sql/drop-tables.sql"),
@@ -67,9 +65,6 @@ const dropTables = async () => {
     console.log("Database connection closed.");
   }
 };
-
-// dropTables();
-// createTables();
 
 //* Alter Tables
 const alterTablesSqlQuery = fs.readFileSync(
@@ -98,4 +93,6 @@ const alterTables = async () => {
   }
 };
 
+// createTables();
+// dropTables();
 // alterTables();
