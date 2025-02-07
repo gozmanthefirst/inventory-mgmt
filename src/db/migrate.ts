@@ -94,5 +94,5 @@ const alterTables = async () => {
 };
 
 // createTables();
-// dropTables();
+dropTables();
 // alterTables();

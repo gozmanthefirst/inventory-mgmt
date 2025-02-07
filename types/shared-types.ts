@@ -9,31 +9,3 @@ export enum HttpStatusCode {
   BAD_GATEWAY = 502,
   SERVICE_UNAVAILABLE = 503,
 }
-
-export type Book = {
-  id: number;
-  title: string;
-  subtitle: string;
-  book_desc: string;
-  image_url: string;
-  isbn: string;
-  publisher: number;
-  published_date: Date;
-  page_count: number;
-  created_at: Date;
-  updated_at: Date;
-};
-
-export type Author = {
-  id: number;
-  author_name: string;
-  created_at: Date;
-  updated_at: Date;
-};
-
-export type Genre = {
-  id: number;
-  genre_name: string;
-  created_at: Date;
-  updated_at: Date;
-};

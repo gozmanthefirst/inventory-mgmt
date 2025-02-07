@@ -1,37 +1,51 @@
 // Local Imports
-import pool from "../db/pool";
+import { db } from "../db/prisma";
 
-export const getAllGenresQuery = async () => {
-  const { rows } = await pool.query(`SELECT * FROM genres`);
-
-  return rows;
+export const getAllGenresQ = async () => {
+  const genres = await db.genre.findMany({
+    include: {
+      books: true,
+    },
+  });
+  return genres;
 };
 
-export const createNewGenreQuery = async (name: string) => {
-  const { rows } = await pool.query(
-    `INSERT INTO genres (genre_name)
-   VALUES ($1)
-   RETURNING id`,
-    [name]
-  );
-
-  return Number(rows[0].id);
+export const getGenreByIdQ = async (id: string) => {
+  const genres = await db.genre.findUnique({
+    where: {
+      id,
+    },
+    include: {
+      books: true,
+    },
+  });
+  return genres;
 };
 
-export const getGenreByNameQuery = async (name: string) => {
-  const { rows } = await pool.query(
-    `SELECT * FROM genres
-     WHERE genre_name = $1`,
-    [name]
-  );
-
-  return rows[0];
+export const getGenreByNameQ = async (name: string) => {
+  const genres = await db.genre.findUnique({
+    where: {
+      genreName: name,
+    },
+    include: {
+      books: true,
+    },
+  });
+  return genres;
 };
 
-export const deleteGenreByIdQuery = async (id: number) => {
-  await pool.query(
-    `DELETE FROM genres
-     WHERE id = $1`,
-    [id]
-  );
+export const deleteGenreByIdQ = async (id: string) => {
+  await db.genre.delete({
+    where: {
+      id,
+    },
+  });
+};
+
+export const deleteOrphanedGenres = async () => {
+  await db.genre.deleteMany({
+    where: {
+      books: { none: {} },
+    },
+  });
 };

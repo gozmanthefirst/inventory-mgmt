@@ -1,10 +1,11 @@
 // External Imports
+import { Genre } from "@prisma/client";
 import { RequestHandler } from "express";
 
 // Local Imports
-import { Genre, HttpStatusCode } from "../../types/shared-types";
+import { HttpStatusCode } from "../../types/shared-types";
 import { HttpError } from "../interfaces/httpError";
-import { getAllGenresQuery } from "../lib/genres";
+import { getAllGenresQ } from "../lib/genres";
 import { successResponse } from "../utils/api-response";
 
 /**
@@ -13,7 +14,7 @@ import { successResponse } from "../utils/api-response";
  */
 export const getAllGenres: RequestHandler = async (req, res, next) => {
   try {
-    const genres: Genre[] = await getAllGenresQuery();
+    const genres: Genre[] = await getAllGenresQ();
     return res.json(successResponse("Genres successfully retrieved.", genres));
   } catch (error) {
     (error as HttpError).status = HttpStatusCode.INTERNAL_SERVER_ERROR;

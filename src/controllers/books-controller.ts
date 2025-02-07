@@ -1,38 +1,19 @@
 // External Imports
+import { Book } from "@prisma/client";
 import { RequestHandler } from "express";
 
 // Local Imports
-import { BookSearchResult } from "../../types/google-books";
-import { Author, Book, Genre, HttpStatusCode } from "../../types/shared-types";
+import { HttpStatusCode } from "../../types/shared-types";
 import { HttpError } from "../interfaces/httpError";
+import { deleteOrphanedAuthors } from "../lib/authors";
 import {
-  createNewAuthorQuery,
-  deleteAuthorByIdQuery,
-  getAuthorByNameQuery,
-} from "../lib/authors";
-import {
-  createNewBookAuthorQuery,
-  getAuthorIdByBookIdQuery,
-  getBookIdByAuthorIdQuery,
-} from "../lib/book-authors";
-import {
-  createNewBookGenreQuery,
-  getBookIdByGenreIdQuery,
-  getGenreIdByBookIdQuery,
-} from "../lib/book-genres";
-import {
-  createNewBookQuery,
-  deleteBookByIdQuery,
-  getAllBooksQuery,
-  getBookByIdQuery,
-  getBookByIsbn,
+  createNewBookQ,
+  deleteBookByIdQ,
+  getAllBooksQ,
+  getBookByIdQ,
+  getBookByIsbnQ,
 } from "../lib/books";
-import {
-  createNewGenreQuery,
-  deleteGenreByIdQuery,
-  getGenreByNameQuery,
-} from "../lib/genres";
-import { searchBooks } from "../services/google-books";
+import { deleteOrphanedGenres } from "../lib/genres";
 import { errorResponse, successResponse } from "../utils/api-response";
 import { isValidPastDate } from "../utils/datetime";
 import { removeDashesAndSpaces } from "../utils/string";
@@ -43,7 +24,7 @@ import { removeDashesAndSpaces } from "../utils/string";
  */
 export const getAllBooks: RequestHandler = async (req, res, next) => {
   try {
-    const books: Book[] = await getAllBooksQuery();
+    const books: Book[] = await getAllBooksQ();
     return res.json(successResponse("Books successfully retrieved.", books));
   } catch (error) {
     (error as HttpError).status = HttpStatusCode.INTERNAL_SERVER_ERROR;
@@ -74,9 +55,6 @@ export const createBook: RequestHandler = async (req, res, next) => {
     // Check for required fields
     const requiredFields = [
       { name: "Title", value: title },
-      { name: "ISBN", value: isbn },
-      { name: "Publisher", value: publisher },
-      { name: "Published Date", value: publishedDate },
       { name: "Page Count", value: pageCount },
       { name: "Author(s)", value: authors },
       { name: "Genre(s)", value: genres },
@@ -135,7 +113,7 @@ export const createBook: RequestHandler = async (req, res, next) => {
     }
 
     // Check if a book already has that ISBN
-    const existingIsbn = await getBookByIsbn(modifiedIsbn);
+    const existingIsbn = await getBookByIsbnQ(modifiedIsbn);
 
     if (existingIsbn) {
       return res
@@ -250,109 +228,22 @@ export const createBook: RequestHandler = async (req, res, next) => {
     const finalPubDate = new Date(publishedDate);
 
     //* Create book and return book ID
-    //! Turn the argument into an object. Easier to work with that way!
-    const bookId = await createNewBookQuery(
+    await createNewBookQ({
       title,
-      modifiedIsbn,
+      subtitle: finalSubtitle,
+      bookDesc: finalBookDesc,
+      imageUrl: finalImageUrl,
+      isbn: modifiedIsbn,
       publisher,
-      finalPubDate,
+      publishedDate: finalPubDate,
       pageCount,
-      finalSubtitle,
-      finalBookDesc,
-      finalImageUrl
-    );
-
-    // Add the book-author relationship in the join table
-    for (const authorName of authors) {
-      const author: Author = await getAuthorByNameQuery(authorName);
-
-      let authorId: number;
-
-      // Check if author's name already exist
-      if (!author) {
-        // If there's no existing author, make a request to add Author's name to authors table and return the ID.
-        authorId = await createNewAuthorQuery(authorName);
-      } else {
-        // If there's an existing author, get the ID of the already existing author.
-        authorId = author.id;
-      }
-
-      await createNewBookAuthorQuery(bookId, authorId);
-    }
-
-    // Add the book-genre relationship in the join table
-    for (const genreName of genres) {
-      const genre: Genre = await getGenreByNameQuery(genreName);
-
-      let genreId: number;
-
-      // Check if genre's name already exist
-      if (!genre) {
-        // If there's no existing genre, make a request to add Genre's name to genres table and return the ID.
-        genreId = await createNewGenreQuery(genreName);
-      } else {
-        // If there's an existing genre, get the ID of the already existing genre.
-        genreId = genre.id;
-      }
-
-      await createNewBookGenreQuery(bookId, genreId);
-    }
+      authors,
+      genres,
+    });
 
     return res
       .status(HttpStatusCode.CREATED)
       .json(successResponse("Book successfully created."));
-  } catch (error) {
-    (error as HttpError).status = HttpStatusCode.INTERNAL_SERVER_ERROR;
-    return next(error);
-  }
-};
-
-/**
- * Search for a book
- * @route GET /search
- */
-export const searchBook: RequestHandler = async (req, res, next) => {
-  try {
-    const query = req.query.q as string;
-
-    if (!query) {
-      return res
-        .status(HttpStatusCode.BAD_REQUEST)
-        .json(errorResponse("MISSING_QUERY", "Search query is required."));
-    }
-
-    let result = await searchBooks(query);
-
-    const formattedResult: BookSearchResult[] = result.map((book) => {
-      const formattedBook = {
-        id: book.id,
-        title: book.volumeInfo.title,
-        subtitle: book.volumeInfo.subtitle || "",
-        authors: book.volumeInfo.authors,
-        description: book.volumeInfo.description || "",
-        publisher: book.volumeInfo.publisher,
-        publishedDate: book.volumeInfo.publishedDate,
-        isbn10:
-          book.volumeInfo.industryIdentifiers?.find(
-            (identifier) => identifier.type === "ISBN_10"
-          )?.identifier || "",
-        isbn13:
-          book.volumeInfo.industryIdentifiers?.find(
-            (identifier) => identifier.type === "ISBN_13"
-          )?.identifier || "",
-        pageCount: book.volumeInfo.pageCount,
-        categories: book.volumeInfo.categories,
-        image: book.volumeInfo.imageLinks?.thumbnail || "",
-      };
-
-      return formattedBook;
-    });
-
-    const finalResult = formattedResult.filter((book) => book.pageCount > 0);
-
-    return res.json(
-      successResponse("Book search results gotten.", finalResult)
-    );
   } catch (error) {
     (error as HttpError).status = HttpStatusCode.INTERNAL_SERVER_ERROR;
     return next(error);
@@ -365,16 +256,9 @@ export const searchBook: RequestHandler = async (req, res, next) => {
  */
 export const getBook: RequestHandler = async (req, res, next) => {
   try {
-    const id = Number(req.params.id);
+    const id = `${req.params.id}`;
 
-    // Return an error if id is not a valid number
-    if (typeof id !== "number" || isNaN(id)) {
-      return res
-        .status(HttpStatusCode.BAD_REQUEST)
-        .json(errorResponse("INVALID_ID", "Invalid book id."));
-    }
-
-    const book: Book = await getBookByIdQuery(id);
+    const book = await getBookByIdQ(id);
 
     // Return an error if the book was not found
     if (!book) {
@@ -396,16 +280,9 @@ export const getBook: RequestHandler = async (req, res, next) => {
  */
 export const deleteBook: RequestHandler = async (req, res, next) => {
   try {
-    const id = Number(req.params.id);
+    const id = `${req.params.id}`;
 
-    // Return an error if id is not a valid number
-    if (typeof id !== "number" || isNaN(id)) {
-      return res
-        .status(HttpStatusCode.BAD_REQUEST)
-        .json(errorResponse("INVALID_ID", "Invalid book id."));
-    }
-
-    const book: Book = await getBookByIdQuery(id);
+    const book = await getBookByIdQ(id);
 
     // Return an error if the book was not found
     if (!book) {
@@ -414,36 +291,12 @@ export const deleteBook: RequestHandler = async (req, res, next) => {
         .json(errorResponse("NOT_FOUND", "Book not found."));
     }
 
-    // Get the ID(s) of the author(s) of the book
-    const bookAuthorsIds = await getAuthorIdByBookIdQuery(book.id);
-
-    // Get the ID(s) of the genre(s) of the book
-    const bookGenresIds = await getGenreIdByBookIdQuery(book.id);
-
     // Delete book
-    await deleteBookByIdQuery(id);
+    await deleteBookByIdQ(id);
 
-    // Check if the authors of the deleted book have any other book
-    bookAuthorsIds.forEach(async (item) => {
-      const authorId = Number(item.author_id);
-      const bookIds = await getBookIdByAuthorIdQuery(authorId);
-
-      // If the author doesn't have any other book, delete them from the author table
-      if (bookIds.length === 0) {
-        await deleteAuthorByIdQuery(authorId);
-      }
-    });
-
-    // Check if the genres of the deleted book have any other book
-    bookGenresIds.forEach(async (item) => {
-      const genreId = Number(item.genre_id);
-      const bookIds = await getBookIdByGenreIdQuery(genreId);
-
-      // If the genre doesn't have any other book, delete them from the genre table
-      if (bookIds.length === 0) {
-        await deleteGenreByIdQuery(genreId);
-      }
-    });
+    // Delete authors and genres if they no longer have a connected book
+    await deleteOrphanedAuthors();
+    await deleteOrphanedGenres();
 
     return res.json(successResponse("Book successfully deleted."));
   } catch (error) {

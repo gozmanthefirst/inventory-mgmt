@@ -1,10 +1,11 @@
 // External Imports
+import { Author } from "@prisma/client";
 import { RequestHandler } from "express";
 
 // Local Imports
-import { Author, HttpStatusCode } from "../../types/shared-types";
+import { HttpStatusCode } from "../../types/shared-types";
 import { HttpError } from "../interfaces/httpError";
-import { getAllAuthorsQuery } from "../lib/authors";
+import { getAllAuthorsQ } from "../lib/authors";
 import { successResponse } from "../utils/api-response";
 
 /**
@@ -13,7 +14,7 @@ import { successResponse } from "../utils/api-response";
  */
 export const getAllAuthors: RequestHandler = async (req, res, next) => {
   try {
-    const authors: Author[] = await getAllAuthorsQuery();
+    const authors: Author[] = await getAllAuthorsQ();
     return res.json(
       successResponse("Authors successfully retrieved.", authors)
     );

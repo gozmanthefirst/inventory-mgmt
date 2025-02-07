@@ -1,27 +1,41 @@
 // Local Imports
-import pool from "../db/pool";
+import { db } from "../db/prisma";
 
-export const getAllBooksQuery = async () => {
-  const { rows } = await pool.query(`SELECT * FROM books`);
-
-  return rows;
+export const getAllBooksQ = async () => {
+  const books = await db.book.findMany({
+    include: {
+      authors: true,
+      genres: true,
+    },
+  });
+  return books;
 };
 
-export const createNewBookQuery = async (
-  title: string,
-  isbn: string,
-  publisher: string,
-  publishedDate: Date,
-  pageCount: number,
-  subtitle?: string,
-  bookDesc?: string,
-  imageUrl?: string
-) => {
-  const { rows } = await pool.query(
-    `INSERT INTO books (title, subtitle, book_desc, image_url, isbn, publisher, published_date, page_count)
-   VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
-   RETURNING id`,
-    [
+export const createNewBookQ = async ({
+  title,
+  subtitle,
+  bookDesc,
+  imageUrl,
+  isbn,
+  publisher,
+  publishedDate,
+  pageCount,
+  authors,
+  genres,
+}: {
+  title: string;
+  subtitle?: string;
+  bookDesc?: string;
+  imageUrl?: string;
+  isbn?: string;
+  publisher?: string;
+  publishedDate?: Date;
+  pageCount: number;
+  authors: string[];
+  genres: string[];
+}) => {
+  await db.book.create({
+    data: {
       title,
       subtitle,
       bookDesc,
@@ -30,52 +44,52 @@ export const createNewBookQuery = async (
       publisher,
       publishedDate,
       pageCount,
-    ]
-  );
-
-  return Number(rows[0].id);
+      authors: {
+        connectOrCreate: authors.map((name) => ({
+          where: { authorName: name },
+          create: { authorName: name },
+        })),
+      },
+      genres: {
+        connectOrCreate: genres.map((name) => ({
+          where: { genreName: name },
+          create: { genreName: name },
+        })),
+      },
+    },
+  });
 };
 
-export const getBookByIdQuery = async (id: number) => {
-  const { rows } = await pool.query(
-    `SELECT * FROM books
-     WHERE id = $1`,
-    [id]
-  );
-
-  return rows[0];
+export const getBookByIdQ = async (id: string) => {
+  const book = await db.book.findUnique({
+    where: {
+      id,
+    },
+    include: {
+      authors: true,
+      genres: true,
+    },
+  });
+  return book;
 };
 
-export const getBookByIsbn = async (isbn: string) => {
-  const { rows } = await pool.query(
-    `SELECT * FROM books
-     WHERE isbn = $1`,
-    [isbn]
-  );
-
-  return rows[0];
+export const getBookByIsbnQ = async (isbn: string) => {
+  const book = await db.book.findUnique({
+    where: {
+      isbn,
+    },
+    include: {
+      authors: true,
+      genres: true,
+    },
+  });
+  return book;
 };
 
-// export const updateBookByIdQuery = async (
-//   title: string,
-//   isbn: string,
-//   pub_year: number,
-//   quantity: number,
-//   price: number,
-//   id: number
-// ) => {
-//   await pool.query(
-//     `UPDATE books
-//     SET title = $1, isbn = $2, pub_year = $3, quantity = $4, price = $5
-//      WHERE id = $6`,
-//     [title, isbn, pub_year, quantity, price, id]
-//   );
-// };
-
-export const deleteBookByIdQuery = async (id: number) => {
-  await pool.query(
-    `DELETE FROM books
-     WHERE id = $1`,
-    [id]
-  );
+export const deleteBookByIdQ = async (id: string) => {
+  await db.book.delete({
+    where: {
+      id,
+    },
+  });
 };
