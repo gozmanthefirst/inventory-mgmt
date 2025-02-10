@@ -38,7 +38,9 @@ RUN npm install -g pnpm && \
     pnpm install --prod --frozen-lockfile
 
 # Set the environment variable
-ENV NODE_ENV=production
+ENV NODE_ENV=production \
+    HOSTNAME="0.0.0.0" \
+    PORT=8001
 
 # Expose the port that the app runs only
 EXPOSE 8001

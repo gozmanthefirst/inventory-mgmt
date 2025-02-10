@@ -15,7 +15,7 @@ import genresRouter from "./routes/genres-route";
 
 dotenv.config();
 
-const PORT = process.env.PORT || 8000;
+const PORT = process.env.PORT || 8001;
 
 // Initialize Express app
 const app = express();
