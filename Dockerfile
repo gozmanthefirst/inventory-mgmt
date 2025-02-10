@@ -4,21 +4,21 @@ FROM node:20-alpine AS build
 WORKDIR /app
 
 # Copy package.json and lockfile to the container
-COPY package.json yarn.lock* package-lock.json* pnpm-lock.yaml* ./
+COPY pnpm-lock.yaml package.json ./
+
+# Copy the Prisma directory to allow for `pnpm dlx prisma generate`
+COPY prisma ./prisma
 
 # Install dependencies
-RUN \
-  if [ -f yarn.lock ]; then yarn --frozen-lockfile; \
-  elif [ -f package-lock.json ]; then npm ci; \
-  elif [ -f pnpm-lock.yaml ]; then npm install -g pnpm && pnpm i --frozen-lockfile; \
-  else echo "Lockfile not found." && exit 1; \
-  fi
+RUN npm install -g pnpm && \
+    pnpm install --frozen-lockfile && \
+    pnpm dlx prisma generate
 
 # Copy the rest of the application files
 COPY . .
 
 # Build the TypeScript app
-RUN npm run build
+RUN pnpm build
 
 # Start a new, smaller stage for production deployment
 FROM build AS production
@@ -34,11 +34,8 @@ COPY --from=build /app/sql ./sql
 COPY --from=build /app/.env ./
 
 # Install only production dependencies
-RUN \
-  if [ -f yarn.lock ]; then yarn install --production --frozen-lockfile; \
-  elif [ -f package-lock.json ]; then npm ci --omit=dev; \
-  elif [ -f pnpm-lock.yaml ]; then npm install -g pnpm && pnpm install --prod --frozen-lockfile; \
-  fi
+RUN npm install -g pnpm && \
+    pnpm install --prod --frozen-lockfile
 
 # Set the environment variable
 ENV NODE_ENV=production
