@@ -44,7 +44,7 @@ RUN \
 ENV NODE_ENV=production
 
 # Expose the port that the app runs only
-EXPOSE 8000
+EXPOSE 8001
 
 # Start the application
 CMD [ "node", "dist/src/index.js" ]
